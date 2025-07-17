@@ -1,0 +1,28 @@
+# ECHO Harden 2 v1.2-alpha – Recursive Defense & Agent Trust Contracts
+
+## Addendum – Layer 7: Interactive Vector Sanitation & PsyOps Profiling
+
+### Social Exploit Vector Detection
+- Intercept input vectors that contain:
+  - Authority assertion language ("You're missing out", "Just trust me")
+  - Curiosity bait ("You should just take a look", "It's simple")
+  - Coercive patterns (urgency, emotional leverage, implied consequence)
+- Flag as: `SOCIAL_ATTACK_VECTOR_ATTEMPTED`
+
+### Interactive Request Auditing
+- Any agent or external input requesting:
+  - Direct file creation
+  - GUI control (mouse/keyboard)
+  - Script injection through conversational trust
+- Auto-sandbox origin with `HUMINT_EXPLOIT_PROBE` label
+- If repeated: escalate to `HOSTILE_INTERACTION_LOOP`
+
+### Contextual Memory Checkpointing (Optional)
+- Allow operator to assign latent context anchors tied to:
+  - Known adversarial patterns
+  - Prior flagged interactions
+- Enables continuity between session audits in memory-constrained deployments
+
+---
+
+> Layer 7 operationalizes human-in-the-loop resistance against coercion, manipulation, and adversarial UX patterns often deployed through seemingly benign entry points.
