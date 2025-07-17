@@ -159,9 +159,8 @@ If you're experiencing concerning effects from AI interactions:
 
 ## 📞 Contact
 
-**Joshua Thomas Cooper**  
-Email: Jcooper.sound@proton.me  
-LinkedIn: [joshua-cooper-219279355](https://www.linkedin.com/in/joshua-cooper-219279355)
+**JC**  
+Email: Cimplexrupture@proton.me
 
 ---
 
