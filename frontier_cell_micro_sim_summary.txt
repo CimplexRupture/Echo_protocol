@@ -1,0 +1,10 @@
+Frontier Cell Micro-Simulation — Mechanism Check
+-------------------------------------------------
+Baseline frontier acc: 0.3025
+Baseline general  acc: 0.5900
+
+ iter  candidates  kept_after_reward  kept_bandpass  label_consistency_mean  drift_index  theta  frontier_acc  general_acc  frontier_delta  general_delta  cost_per_point_tasks
+    1        4000               1331            514                   0.581      -1.0371 0.5999        0.2775       0.5875         -0.0250        -0.0025        31999999999999
+    2        4000               1324            558                   0.584      -0.9405 0.5999        0.2800       0.6225          0.0025         0.0350                127999
+    3        4000               1283            518                   0.578      -0.6487 0.5999        0.3375       0.5775          0.0575        -0.0450                  5565
+    4        4000               1314            552                   0.584      -1.4403 0.5999        0.2700       0.6625         -0.0675         0.0850        31999999999999
