@@ -1,0 +1,53 @@
+
+# Lean Build Spec: Telomere-Based Memory Governance (MVP)
+
+## 1. Core Concepts
+- **Memory Tiering**: Four states — Hot, Warm, Cold, Discarded.
+- **Digital Telomere**: Each memory has a lifespan score (L) that decays over time and under stress.
+- **Right-to-Forget (RTF)**: Operational ability to mark, quarantine, purge, and tombstone memories.
+
+## 2. Memory State Rules
+
+### Tier Transitions
+Resonance Score (RS):
+RS(m) = w1*task_success + w2*match_rate + w3*recency_decay + w4*endorsements - w5*harm_risk - w6*drift_caused
+
+Suggested thresholds:
+- Hot: ≥ 0.7
+- Warm: 0.4–0.7
+- Cold: 0.15–0.4
+- Discarded: < 0.15
+
+### Digital Telomere Decay
+L(t+1) = α*L(t) - β*stress + γ*verified_use
+- α: Time decay constant
+- β: Stress penalty (contradictions, harm events)
+- γ: Renewal bonus for verified success
+
+Telomere thresholds trigger auto-downgrade: Hot→Warm→Cold→Marked for Forgetting.
+
+## 3. Minimal RTF Flow
+1. Mark → Quarantine (remove from retrieval)
+2. Purge from doc store + vector index + cache
+3. Verify purge
+4. Tombstone: salted hash + reason code
+
+## 4. Retrieval Rules
+- Cold resurfacing allowed only if it increases novelty coverage (new cluster/time window).
+- Block resurfacing of memories rejected >N times in M days.
+
+## 5. Minimal Metrics
+- Hit rate@k: % retrieved memories that contribute to success.
+- Loop rate: % resurfaced memories rejected repeatedly.
+- Time-to-cool: median hours from last success → Warm/Cold.
+- RTF SLA: mean/95p time from Marked → Purged.
+
+## 6. User Controls (Optional MVP UI)
+- Show state, telomere bar, last used, reason for tier.
+- Buttons: Pin, Cool, Forget.
+
+## 7. Out of Scope for MVP (Future Work)
+- Distributed purge guarantees
+- Certified unlearning in model weights
+- Affect-aware retrieval
+- Inter-agent divergence enforcement
