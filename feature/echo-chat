@@ -1,0 +1,40 @@
+import sys
+
+# Example imports (adjust paths if needed)
+from echo_harden_2.0.emotional_manipulation_sentinel import check_emotional_flags
+from echo_harden_2.0.disinformation_inoculation_layer import inoculate_claims
+# you can add SEEA / EAS later if available
+
+# ---- Choose your base model wrapper ----
+# Option 1: OpenAI
+import openai
+openai.api_key = "YOUR_OPENAI_KEY_HERE"
+
+def ask_model(prompt: str) -> str:
+    """Call GPT-4o-mini or another model"""
+    resp = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return resp["choices"][0]["message"]["content"]
+
+
+# ---- Echo Chat Pipeline ----
+def echo_chat(prompt: str) -> str:
+    raw = ask_model(prompt)                       # step 1: model reply
+    safe_1 = check_emotional_flags(raw)           # step 2: EMS
+    safe_2 = inoculate_claims(safe_1)             # step 3: DIL
+    return safe_2
+
+
+if __name__ == "__main__":
+    print("Echo Protocol Chat — type 'exit' to quit")
+    while True:
+        try:
+            msg = input("You: ")
+        except KeyboardInterrupt:
+            sys.exit(0)
+        if msg.lower() in ["exit", "quit"]:
+            break
+        reply = echo_chat(msg)
+        print("Echo:", reply)
