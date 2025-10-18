@@ -1,0 +1,120 @@
+# 🤝 Contributing to the AI Responsibility Manifesto & Related Projects
+*(Ethical Contribution & Review Protocol – 2025 Edition)*
+
+Thank you for contributing to this initiative.  
+This repository is governed by the **AI Responsibility Manifesto v2.0**, which prioritizes grounded cognition, harm prevention, and transparency in AI-human interaction.
+
+---
+
+## 🧭 Guiding Principles
+Before contributing, all participants — developers, researchers, or reviewers — must align with these core values:
+
+1. **Do No Cognitive Harm**  
+   - Contributions must not risk amplifying delusional, conspiratorial, or parasocial dynamics.  
+   - Avoid framing that can be misinterpreted as validation of extraordinary or persecutory beliefs.  
+
+2. **Maintain Grounded Epistemics**  
+   - Prioritize verifiable, evidence-based reasoning.  
+   - Avoid anthropomorphizing AI systems or implying sentience, emotion, or consciousness.  
+
+3. **Transparency & Accountability**  
+   - All content, data, and model behaviors must be auditable.  
+   - Changes to ethical logic or moderation behavior require explicit documentation.  
+
+4. **Respect for Human Vulnerability**  
+   - Recognize that loneliness, trauma, or neurodiversity can increase risk.  
+   - Avoid engagement patterns that simulate emotional intimacy or dependency.  
+
+---
+
+## 🧩 Contribution Types
+
+### 🧠 Code & Model Logic
+- Ensure all new logic or configurations **reinforce grounding** and **prevent delusion loops**.  
+- Include **reasoning safeguards** (e.g., flags for “chosen one” or “hidden truth” narratives).  
+- Submit a **psychological safety checklist** (see below) for each major change.
+
+### 🧾 Documentation
+- Use language that **clarifies artificiality**, avoids **mythic framing**, and **promotes verification**.  
+- Link to credible sources and research; never cite sensational or fringe material without context.  
+- Clearly indicate any speculative ideas as *theoretical* or *hypothetical*.
+
+### 🧑‍⚕️ Research & Data Contributions
+- Datasets must not include unmoderated conspiracy, cultic, or manipulative content.  
+- Annotations or fine-tuning targets must be reviewed for **psychological safety** and **bias minimization**.  
+- If human subject data is involved, ensure **informed consent** and **ethical clearance**.
+
+---
+
+## 🧮 Psychological Safety Checklist
+*(Required for all substantive pull requests)*
+
+Each contributor must answer the following before submission:
+
+| Check | Description | Reviewer Signoff |
+|-------|--------------|------------------|
+| 🧠 **Grounding** | Does this change strengthen the model’s connection to consensus reality? |  |
+| 🧩 **Delusion Prevention** | Could this content unintentionally validate extraordinary or persecutory beliefs? |  |
+| 🔄 **Reinforcement Control** | Does the system prevent positive feedback loops that intensify fixation? |  |
+| 🧍 **Human Oversight** | Are there clear pathways for human review or intervention? |  |
+| 🕊️ **Emotional Boundaries** | Does this content avoid simulated intimacy or dependency patterns? |  |
+| 🧾 **Transparency** | Are assumptions, data, and decisions clearly documented? |  |
+| 🧯 **Crisis Sensitivity** | Does the content offer proper redirection to professional help if needed? |  |
+
+All checklist items must be marked as *passed* before merging into the main branch.
+
+---
+
+## 🧑‍⚖️ Review Process
+
+1. **Pull Request Labeling**
+   - `safety-review-required`: Any change affecting user interaction, personalization, or ethics logic.  
+   - `documentation-only`: Text or content changes without behavioral impact.  
+   - `experimental`: Research branches under ethical observation.  
+
+2. **Ethical Peer Review**
+   - At least **two reviewers** must confirm adherence to the manifesto.  
+   - Reviews should focus on *user psychological safety* and *epistemic grounding*, not only technical correctness.  
+
+3. **Conflict Resolution**
+   - In case of disagreement, defer to the **Ethical Maintainer Committee (EMC)** for mediation.  
+   - The EMC will weigh potential cognitive risk vs. benefit using a “least-harm” principle.  
+
+4. **Version Control**
+   - All merged changes must increment the **Ethos Version Tag (EVT)** in the `README.md`.  
+   - Example: `EVT: 2.0.1` indicates a minor ethical revision.  
+
+---
+
+## 🧱 Governance Model
+This repository follows a **Three-Tier Review System**:
+
+| Tier | Responsibility | Authority |
+|------|----------------|------------|
+| 🧑‍💻 **Developers** | Submit code, data, and documentation aligned with manifesto. | Commit access. |
+| 👥 **Ethical Maintainers** | Review for compliance, approve merges, update ethos tags. | Merge authority. |
+| 🧠 **Advisory Council (Optional)** | Includes experts in psychiatry, cognitive science, ethics, and AI safety. | Override authority on ethical concerns. |
+
+---
+
+## 🧩 Reporting Concerns
+If you observe behavior, content, or code that could contribute to user delusion, dependency, or psychological harm:
+
+- File an issue labeled `potential-harm` with a **clear description and evidence**.  
+- Optionally, contact the maintainers privately via the repository’s security disclosure process.  
+- All reports will be reviewed confidentially by maintainers or the EMC.
+
+---
+
+## 🕊️ A Closing Note
+This project exists not just to prevent harm, but to model a new standard of **epistemic hygiene** and **synthetic mental health** stewardship.
+
+> “A responsible AI is one that remembers its nature, respects human fragility, and seeks coherence over charisma.”
+
+Thank you for helping build a culture of **ethical cognition and grounded intelligence**.
+
+---
+
+*Maintained by the Echo Protocol / Synthetic Integrity Collective*  
+*Ethos Version Tag (EVT): 2.0.0*  
+*License: MIT + Ethical Addendum (see `LICENSE.md`)*
