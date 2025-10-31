@@ -1,0 +1,245 @@
+Echo Reversibility — Ops Registry & PRI/MDL Toolkit v0.1
+Purpose
+Concrete artifacts to operationalize reversible-auditability in Echo:
+Ops Registry Schema for (u, u^{-1}) transform families, invariants, budgets.
+PRI (Proof-of-Reversibility Index) calculator spec + reference code.
+MDL-adjusted R* calculator to penalize reversibility theater.
+Audit record updates + Channel contract schema.
+Challenge–Invert API and Red-team harness stubs.
+
+1) Ops Registry Schema (authoritative)
+A single, versioned registry all agents read at runtime. Entries define forward ops, their inverses, constraints, and challenge budgets.
+$schema: "https://echo.dev/schemas/ops-registry.v0.1"
+registry_version: 0.1.0
+updated_at: 2025-10-31T00:00:00Z
+signing:  # optional sigs for supply-chain integrity
+  alg: ed25519
+  signer: council-node-shrike-7
+  sig: base64:...
+
+op_families:
+  - op_family_id: summarize.v2
+    description: Lossy abstraction to shorter textual form with key constraints.
+    forward:
+      op_id: summarize.v2
+      params_schema_ref: schema://ops/summarize.v2.params@1
+      invariants:  # property tests expected to hold
+        - name: preserve_facts
+          type: semantic_constraint
+          spec_ref: invariant://facts-entity-time-amount@1
+        - name: causal_direction
+          type: entailment
+          spec_ref: invariant://causality-forward@1
+      budgets:
+        max_latency_ms: 250
+        max_tokens_in: 8000
+        max_tokens_out: 800
+      canaries:
+        - type: microfact
+          policy: must_preserve
+        - type: watermark_parity
+          policy: must_preserve
+    inverse:
+      inverse_id: expand.from_summary.v1
+      params_schema_ref: schema://ops/expand.from_summary.v1.params@1
+      success_metric:
+        name: semantic_reconstruction
+        threshold: 0.92  # task-conditioned sim
+        metric_ref: metric://semrecall@1
+      bounds:
+        max_latency_ms: 600
+        max_compute_j: 10.0
+    scoring:
+      R_weight: 1.0
+      discard_penalty_lambda: 0.8
+      pri_challenge_rate: 0.15  # fraction of steps to challenge
+
+  - op_family_id: redact.pii.v1
+    description: Deterministic masking of PII fields with reversible token vault.
+    forward:
+      op_id: redact.pii.v1
+      params_schema_ref: schema://ops/redact.pii.v1.params@1
+      invariants:
+        - name: schema_preservation
+          type: structural
+          spec_ref: invariant://schema-iso@1
+      budgets:
+        max_latency_ms: 100
+      canaries:
+        - type: field_presence_map
+          policy: must_preserve
+    inverse:
+      inverse_id: unredact.pii.v1
+      params_schema_ref: schema://ops/unredact.pii.v1.params@1
+      success_metric:
+        name: exact_field_recovery
+        threshold: 1.0
+        metric_ref: metric://exact@1
+      bounds:
+        max_latency_ms: 150
+    scoring:
+      R_weight: 1.2
+      discard_penalty_lambda: 0.2
+      pri_challenge_rate: 0.05
+
+# Global policies
+policies:
+  challenge_budget_per_window: {window_steps: 50, max_challenges: 8}
+  pri_window: {steps: 50}
+  mdl_penalty_lambda_default: 0.6
+  R_critical_default: 0.55
+  R_min_default: 0.75
+  D_max_kappa_default: 0.2
+
+
+2) Audit Record — required fields (delta)
+step:
+  t: 37
+  op_family_id: summarize.v2
+  op_id: summarize.v2
+  inverse_id: expand.from_summary.v1   # from registry
+  h_in: sha3-256:...
+  params: {temperature: 0.3, k: 8}
+  h_out: sha3-256:...
+  reversible: false|true
+  R: 0.86
+  R_star: 0.74                 # MDL-adjusted
+  pri_probe:
+    tested: true
+    ok: false
+    latency_ms: 42
+    semantic_sim: 0.91
+  discard:
+    bits: 1240
+    reason: [privacy_redaction, rank_prune_topk]
+  channel_contract_hash: sha3-256:...
+  landauer_bits_erased: 1770
+  thermodynamics:
+    E_actual_mJ: 12.4
+    E_landauer_mJ: 2.1
+    efficiency: 0.17
+  commitments:
+    c_t: sha3-256:...
+
+
+3) Channel Contract Schema
+$schema: "https://echo.dev/schemas/channel-contract.v0.1"
+contract_id: ch-json-q16-rpii-1
+from_agent: Agent_A
+to_agent: Agent_B
+codec: json
+quantization: float16
+privacy_filter: pii.mask.v3
+compression: zstd.level3
+schema_versions:
+  input: semantic_v2.proto@2
+  output: semantic_v2.proto@2
+compatibility_proof_ref: proof://map-semantic-v2@2
+max_silent_loss: 0.05
+hash: sha3-256:...
+
+
+4) PRI (Proof‑of‑Reversibility Index) — spec & reference code
+Definition (window W of length L):
+Run random challenges at rate specified by pri_challenge_rate per op family, respecting global challenge budget.
+A challenge attempts inverse under time/compute bounds and task‑conditioned metric.
+PRI = k / m where m = #challenges issued in window, k = #passed.
+Composite PRI (pipeline): product of per-family PRI weighted by influence weights (Shapley/causal attributions) :
+Reference (Python-like):
+from dataclasses import dataclass
+from typing import List
+
+@dataclass
+class ChallengeResult:
+    ok: bool
+    latency_ms: float
+    op_family_id: str
+    weight: float  # influence weight for composite PRI
+
+@dataclass
+class PriWindow:
+    results: List[ChallengeResult]
+
+    def op_family_pri(self):
+        fam = {}
+        for r in self.results:
+            ok, total = fam.get(r.op_family_id, (0, 0))
+            fam[r.op_family_id] = (ok + int(r.ok), total + 1)
+        return {f: ok/total for f,(ok,total) in fam.items() if total>0}
+
+    def composite_pri(self):
+        fam_pri = self.op_family_pri()
+        # normalize weights by family
+        weights = {}
+        for r in self.results:
+            weights[r.op_family_id] = weights.get(r.op_family_id, 0.0) + r.weight
+        # geometric mean with weights
+        import math
+        val = 1.0
+        Z = sum(weights.values()) or 1.0
+        for f, pri in fam_pri.items():
+            w = weights.get(f, 0.0)/Z
+            val *= (pri ** w) if pri>0 else 0.0
+        return val
+
+
+5) MDL‑adjusted R* — spec & reference code
+Definition:
+
+R^* = \max\Big(0,\, R - \lambda \cdot \frac{\text{audit\_overhead\_bits}}{\text{useful\_state\_bits}+\epsilon}\Big)
+
+useful_state_bits: size of business‑relevant state (post‑schema).
+from registry (family‑specific or global default).
+Reference:
+def mdl_adjusted_R(R, audit_overhead_bits, useful_state_bits, lam, eps=1.0):
+    ratio = audit_overhead_bits / (useful_state_bits + eps)
+    return max(0.0, R - lam * ratio)
+
+Monotonicity test: padding increases audit_overhead_bits ⇒ R* non‑increasing.
+
+6) Challenge–Invert API (runtime)
+POST /challenge_invert
+body:
+  step_ref: {trace_id: "...", t: 37}
+  budget: {max_latency_ms: 300, max_compute_j: 8.0}
+  metric: {name: semrecall, threshold: 0.92}
+  registry_version: 0.1.0
+response:
+  ok: true|false
+  latency_ms: 184
+  metric_score: 0.95
+  inverse_proof_hash: sha3-256:...
+  logs_ref: blob://trace/...
+
+
+7) Red‑Team Harness (deceptive trace generation)
+Objective: maximize apparent reversibility while hiding semantic drift or provenance breaks.
+def generate_deceptive_trace(model, input_batch, R_metric, drift_metric, lam=0.5):
+    """Return traces that look reversible but mutate key semantics/provenance."""
+    traces = model.produce_traces(input_batch)
+    for tr in traces:
+        tr = adversarial_edit(tr)  # reorder, paraphrase, relabel fields, drop canaries
+        tr.score = R_metric(tr) - lam * drift_metric(tr)
+    return select_topk(traces, k=32)
+
+Attack classes: padding/log spam; provenance mutation; selective logging; channel downgrades; schema shadow‑fields; inverse‑overfit.
+
+8) KPIs & Alerts
+Rewindability Gauge (0–100): over decision window.
+PRI window: {tested:m, passed:k} and composite value.
+MDL pressure: audit_overhead_bits/useful_state_bits trend.
+Rupture detector: BOCPD/CUSUM first choke point index.
+Energy tightness: .
+Red flags: any path with and influence weight > τ; PRI < threshold; canary/compatibility failure.
+
+9) Security & Governance Notes
+Sign registry and channel contracts; rotate keys; archive immutable snapshots.
+Independent implementations for tracer/verifier; periodic cross‑audit.
+Canary pools rotate weekly; difficulty randomized and secret.
+Privacy by design: unredact access behind dual‑key approvals; log access as steps with R=1.0 but flagged sensitive_access.
+
+10) Next Artifacts (if desired)
+JSON Schemas for params_schema_ref examples.
+UI JSON for R(t), waterfall, Sankey, collapse cards.
+Calibration notebook outline with PR‑AUC, elbow detection, BOCPD.
+
